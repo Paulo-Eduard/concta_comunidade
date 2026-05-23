@@ -1,50 +1,208 @@
-#Ideias:
-#Colocar o nome do usuário logado no topo da tela, com um ícone de perfil ao lado.
-#Botão de logout no canto superior direito, que redireciona para a tela de login. (feito)
-
 import customtkinter as ctk
 
 class HomePage(ctk.CTkFrame):
-    def __init__(self, master, navigate_to_callback, usuario_logado, fazer_logout_callback):
-        super().__init__(master, fg_color="transparent")
-        self.navigate_to = navigate_to_callback
-        self.fazer_logout = fazer_logout_callback
-        self.usuario = usuario_logado
 
-        # Header 
-        self.header = ctk.CTkFrame(self, corner_radius=0, height=50)
-        self.header.pack(fill="x", side="top")
-        self.header.pack_propagate(False)
+    def __init__(self, master, mudar_pagina_callback, usuario_logado, logout_callback):
+        super().__init__(master)
 
-        ctk.CTkLabel(self.header, text=f"👤 {self.usuario.get('nome', 'Usuário')}",
-                     font=("Arial", 14), text_color="#a0a0b0").pack(side="left", padx=20, pady=10)
+        # Proteção: Garante que self.usuario seja um dicionário mesmo se for None
+        self.usuario = usuario_logado if usuario_logado is not None else {}
+        self.mudar_pagina = mudar_pagina_callback
+        self.logout = logout_callback
 
-        ctk.CTkButton(self.header, text="Sair", width=80, height=30,
-                      fg_color="#c0392b", hover_color="#922b21",
-                      text_color="white", font=("Arial", 13, "bold"),
-                      command=self.fazer_logout).pack(side="right", padx=20, pady=10)
+        self.configure(fg_color="#0f172a")
 
-        # Título 
-        ctk.CTkLabel(self, text=f"Bem-vindo ao Conecta Comunidade, {self.usuario.get('nome', 'Usuário')}! 🚀",
-                     font=("Arial", 28, "bold"), text_color="white").pack(pady=40)
+        # =====================================================
+        # HEADER
+        # =====================================================
 
-        # Botões do menu
-        self.menu_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.menu_frame.pack(pady=20, padx=20, fill="both", expand=True)
+        header = ctk.CTkFrame(
+            self,
+            height=80,
+            fg_color="#111827",
+            corner_radius=0
+        )
 
-        self.criar_botao("📚 Cursos", "cursos")
-        self.criar_botao("❓ Quiz de Conhecimento", "quiz")
-        self.criar_botao("🤖 Chatbot IA", "chatbot")
-        self.criar_botao("🛡️Segurança Digital", "seguranca")
-        self.criar_botao("💬 Chat de Contato", "chat")
-        self.criar_botao("👤 Meu Perfil", "perfil")
+        header.pack(fill="x")
+        header.pack_propagate(False)
 
-        # Exibe o botão de Gestão apenas para o Professor
-        if self.usuario.get('tipo') == 'professor':
-            self.criar_botao("📊 Gerenciar Alunos", "gestao")
+        titulo = ctk.CTkLabel(
+            header,
+            text="🌐 Conecta Comunidade",
+            font=("Arial", 28, "bold"),
+            text_color="white"
+        )
 
-    def criar_botao(self, texto, destino):
-        btn = ctk.CTkButton(self.menu_frame, text=texto, font=("Arial", 16, "bold"), height=50,
-                            text_color="white", fg_color="#2d6a9f", hover_color="#1a4f7a",
-                            command=lambda: self.navigate_to(destino))
-        btn.pack(pady=10, padx=50, fill="x")
+        titulo.pack(side="left", padx=25)
+
+        usuario_nome = self.usuario.get("nome", "Usuário")
+
+        perfil = ctk.CTkLabel(
+            header,
+            text=f"👤 {usuario_nome}",
+            font=("Arial", 15),
+            text_color="#cbd5e1"
+        )
+
+        perfil.pack(side="right", padx=25)
+
+        # =====================================================
+        # CONTAINER
+        # =====================================================
+
+        main = ctk.CTkScrollableFrame(
+            self,
+            fg_color="transparent"
+        )
+
+        main.pack(
+            fill="both",
+            expand=True,
+            padx=25,
+            pady=25
+        )
+
+        # =====================================================
+        # BEM-VINDO
+        # =====================================================
+
+        welcome = ctk.CTkFrame(
+            main,
+            fg_color="#111827",
+            corner_radius=25
+        )
+
+        welcome.pack(fill="x", pady=(0, 25))
+
+        texto = ctk.CTkLabel(
+            welcome,
+            text=f"Bem-vindo, {usuario_nome} 🚀",
+            font=("Arial", 32, "bold"),
+            text_color="white"
+        )
+
+        texto.pack(anchor="w", padx=30, pady=(25, 10))
+
+        subtitulo = ctk.CTkLabel(
+            welcome,
+            text="Aprenda tecnologia, segurança digital e evolua com a comunidade.",
+            font=("Arial", 16),
+            text_color="#94a3b8"
+        )
+
+        subtitulo.pack(anchor="w", padx=30, pady=(0, 25))
+
+        # =====================================================
+        # CARDS
+        # =====================================================
+
+        cards = ctk.CTkFrame(
+            main,
+            fg_color="transparent"
+        )
+
+        cards.pack(fill="x")
+
+        itens = [
+            ("📚 Cursos", "#2563eb", "cursos"),
+            ("🧠 Quiz", "#7c3aed", "quiz"),
+            ("🤖 IA", "#0891b2", "chatbot"),
+            ("💬 Chat", "#16a34a", "chat"),
+            ("🔒 Segurança", "#dc2626", "seguranca"),
+            ("👤 Perfil", "#ea580c", "perfil")
+        ]
+
+        for i, (titulo_card, cor, destino) in enumerate(itens):
+
+            card = ctk.CTkFrame(
+                cards,
+                fg_color="#111827",
+                corner_radius=22,
+                width=260,
+                height=170
+            )
+
+            row = i // 3
+            col = i % 3
+
+            card.grid(
+                row=row,
+                column=col,
+                padx=15,
+                pady=15
+            )
+
+            card.grid_propagate(False)
+
+            titulo_lbl = ctk.CTkLabel(
+                card,
+                text=titulo_card,
+                font=("Arial", 24, "bold")
+            )
+
+            titulo_lbl.pack(pady=(30, 15))
+
+            btn = ctk.CTkButton(
+                card,
+                text="Acessar",
+                width=180,
+                height=42,
+                fg_color=cor,
+                hover_color=cor,
+                font=("Arial", 14, "bold"),
+                command=lambda d=destino: self.mudar_pagina(d)
+            )
+
+            btn.pack()
+
+        # =====================================================
+        # ADMIN
+        # =====================================================
+
+        if self.usuario.get("tipo") == "professor":
+
+            admin = ctk.CTkFrame(
+                main,
+                fg_color="#111827",
+                corner_radius=25
+            )
+
+            admin.pack(fill="x", pady=25)
+
+            titulo_admin = ctk.CTkLabel(
+                admin,
+                text="⚙ Painel Administrativo",
+                font=("Arial", 24, "bold")
+            )
+
+            titulo_admin.pack(anchor="w", padx=25, pady=(25, 10))
+
+            btn_admin = ctk.CTkButton(
+                admin,
+                text="Abrir Gestão",
+                width=220,
+                height=45,
+                fg_color="#2563eb",
+                hover_color="#1d4ed8",
+                command=lambda: self.mudar_pagina("gestao")
+            )
+
+            btn_admin.pack(padx=25, pady=(0, 25))
+
+        # =====================================================
+        # LOGOUT
+        # =====================================================
+
+        # Proteção: Verifica se o logout existe antes de criar o botão
+        if self.logout:
+            sair = ctk.CTkButton(
+                main,
+                text="🚪 Sair da Conta",
+                height=48,
+                fg_color="#dc2626",
+                hover_color="#b91c1c",
+                font=("Arial", 15, "bold"),
+                command=self.logout
+            )
+
+            sair.pack(fill="x", pady=20)

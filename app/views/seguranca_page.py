@@ -1,49 +1,127 @@
 import customtkinter as ctk
-from tkinter import filedialog, messagebox
-import os
+
 
 class SegurancaPage(ctk.CTkFrame):
-    def __init__(self, master, voltar_callback, usuario_logado, db):
-        super().__init__(master, fg_color="transparent")
-        self.db = db
-        self.usuario = usuario_logado
-        self.caminho_arquivo = ""
-        
-        ctk.CTkButton(self, text="⬅ Voltar", width=100, fg_color="#2d6a9f", command=voltar_callback).pack(anchor="nw", padx=20, pady=20)
-        ctk.CTkLabel(self, text="Segurança Digital", font=("Arial", 24, "bold")).pack(pady=10)
 
-        if self.usuario.get('tipo') == 'professor':
-            self.criar_painel_professor()
-        else:
-            self.criar_painel_aluno()
+    def __init__(self, master, mudar_pagina_callback, usuario_logado, db):
+        super().__init__(master)
 
-    def criar_painel_professor(self):
-        self.entry_titulo = ctk.CTkEntry(self, placeholder_text="Título do Assunto", width=400)
-        self.entry_titulo.pack(pady=5)
-        
-        self.textbox_conteudo = ctk.CTkTextbox(self, width=400, height=200)
-        self.textbox_conteudo.pack(pady=5)
-        
-        ctk.CTkButton(self, text="Anexar Slide/Imagem", command=self.selecionar_arquivo).pack(pady=5)
-        ctk.CTkButton(self, text="Publicar Aula", fg_color="green", command=self.salvar_conteudo).pack(pady=10)
+        self.configure(fg_color="#0f172a")
 
-    def selecionar_arquivo(self):
-        self.caminho_arquivo = filedialog.askopenfilename(filetypes=[("Arquivos", "*.pdf;*.pptx;*.png;*.jpg")])
+        # =====================================================
+        # HEADER
+        # =====================================================
 
-    def salvar_conteudo(self):
-        self.db.salvar_conteudo_seguranca(
-            self.entry_titulo.get(), 
-            self.textbox_conteudo.get("1.0", "end-1c"), 
-            self.caminho_arquivo
+        header = ctk.CTkFrame(
+            self,
+            height=80,
+            fg_color="#111827",
+            corner_radius=0
         )
-        messagebox.showinfo("Sucesso", "Aula publicada!")
 
-    def criar_painel_aluno(self):
-        conteudo = self.db.obter_conteudo_seguranca()
-        if conteudo:
-            ctk.CTkLabel(self, text=conteudo[1], font=("Arial", 20, "bold")).pack(pady=10)
-            ctk.CTkLabel(self, text=conteudo[2], wraplength=500).pack(pady=10)
-            if conteudo[3]:
-                ctk.CTkButton(self, text="Abrir Material de Apoio", command=lambda: os.startfile(conteudo[3])).pack(pady=10)
-        else:
-            ctk.CTkLabel(self, text="Nenhum conteúdo disponível.").pack(pady=20)
+        header.pack(fill="x")
+        header.pack_propagate(False)
+
+        voltar = ctk.CTkButton(
+            header,
+            text="⬅ Voltar",
+            width=120,
+            height=40,
+            fg_color="#2563eb",
+            hover_color="#1d4ed8",
+            command=lambda:
+            mudar_pagina_callback("home")
+        )
+
+        voltar.pack(side="left", padx=20)
+
+        titulo = ctk.CTkLabel(
+            header,
+            text="🔒 Segurança Digital",
+            font=("Arial", 28, "bold"),
+            text_color="white"
+        )
+
+        titulo.pack(side="left", padx=20)
+
+        # =====================================================
+        # CONTAINER
+        # =====================================================
+
+        scroll = ctk.CTkScrollableFrame(
+            self,
+            fg_color="transparent"
+        )
+
+        scroll.pack(
+            fill="both",
+            expand=True,
+            padx=25,
+            pady=25
+        )
+
+        dicas = [
+
+            (
+                "🔑 Senhas Fortes",
+                "Utilize letras maiúsculas, números e símbolos."
+            ),
+
+            (
+                "📧 Cuidado com Phishing",
+                "Nunca clique em links suspeitos."
+            ),
+
+            (
+                "🛡 Autenticação 2FA",
+                "Ative verificação em duas etapas."
+            ),
+
+            (
+                "💻 Atualizações",
+                "Mantenha o sistema sempre atualizado."
+            ),
+
+            (
+                "📱 Redes Sociais",
+                "Não compartilhe informações pessoais."
+            )
+
+        ]
+
+        for titulo_dica, texto_dica in dicas:
+
+            card = ctk.CTkFrame(
+                scroll,
+                fg_color="#111827",
+                corner_radius=20
+            )
+
+            card.pack(fill="x", pady=15)
+
+            titulo_card = ctk.CTkLabel(
+                card,
+                text=titulo_dica,
+                font=("Arial", 24, "bold")
+            )
+
+            titulo_card.pack(
+                anchor="w",
+                padx=25,
+                pady=(20, 10)
+            )
+
+            texto = ctk.CTkLabel(
+                card,
+                text=texto_dica,
+                font=("Arial", 16),
+                justify="left",
+                wraplength=900,
+                text_color="#cbd5e1"
+            )
+
+            texto.pack(
+                anchor="w",
+                padx=25,
+                pady=(0, 25)
+            )

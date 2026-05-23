@@ -1,66 +1,101 @@
 import customtkinter as ctk
-
+from tkinter import messagebox
+import threading
 from app.services.ia_service import IAService
 
 
 class ChatbotPage(ctk.CTkFrame):
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, master, voltar_callback):
+        super().__init__(master)
 
+        self.voltar_callback = voltar_callback
         self.ia = IAService()
 
-        titulo = ctk.CTkLabel(
-            self,
-            text="🤖 Assistente Virtual",
-            font=("Arial", 30, "bold")
-        )
+        self.configure(fg_color="#0f172a")
 
-        titulo.pack(pady=20)
+        # ================= HEADER =================
+        header = ctk.CTkFrame(self, height=80, fg_color="#111827")
+        header.pack(fill="x")
+        header.pack_propagate(False)
 
-        self.chat = ctk.CTkTextbox(
-            self,
-            width=850,
-            height=450
-        )
+        ctk.CTkButton(
+            header,
+            text="⬅ Voltar",
+            fg_color="#2563eb",
+            command=self.voltar
+        ).pack(side="left", padx=20)
 
-        self.chat.pack(pady=20)
+        ctk.CTkLabel(
+            header,
+            text="🤖 Assistente IA",
+            font=("Arial", 26, "bold"),
+            text_color="white"
+        ).pack(side="left", padx=20)
 
-        self.entrada = ctk.CTkEntry(
-            self,
-            width=600,
-            placeholder_text="Digite sua pergunta"
-        )
+        # ================= CHAT =================
+        self.chat_box = ctk.CTkScrollableFrame(self)
+        self.chat_box.pack(fill="both", expand=True, padx=20, pady=20)
 
-        self.entrada.pack(pady=10)
+        # ================= INPUT =================
+        bottom = ctk.CTkFrame(self, fg_color="transparent")
+        bottom.pack(fill="x", padx=20, pady=10)
 
-        botao = ctk.CTkButton(
-            self,
+        self.entry = ctk.CTkEntry(bottom, placeholder_text="Digite sua pergunta...")
+        self.entry.pack(side="left", fill="x", expand=True, padx=(0, 10))
+
+        self.btn = ctk.CTkButton(
+            bottom,
             text="Enviar",
             command=self.enviar
         )
+        self.btn.pack(side="right")
 
-        botao.pack(pady=10)
+    # ================= VOLTAR =================
+    def voltar(self):
+        self.voltar_callback("home")
 
+    # ================= ENVIAR =================
     def enviar(self):
 
-        pergunta = self.entrada.get()
+        pergunta = self.entry.get().strip()
 
-        if pergunta.strip() == "":
+        if not pergunta:
             return
 
-        resposta = self.ia.responder(
-            pergunta
-        )
+        self.add_msg("Você", pergunta)
+        self.entry.delete(0, "end")
 
-        self.chat.insert(
-            "end",
-            f"Você: {pergunta}\n\n"
-        )
+        # trava UI? NÃO MAIS 👇
+        threading.Thread(
+            target=self.processar_ia,
+            args=(pergunta,),
+            daemon=True
+        ).start()
 
-        self.chat.insert(
-            "end",
-            f"IA: {resposta}\n\n"
-        )
+    # ================= IA THREAD =================
+    def processar_ia(self, pergunta):
 
-        self.entrada.delete(0, "end")
+        resposta = self.ia.responder(pergunta)
+
+        self.add_msg("IA", resposta)
+
+    # ================= UI MSG =================
+    def add_msg(self, autor, texto):
+
+        frame = ctk.CTkFrame(self.chat_box, fg_color="#1e293b")
+        frame.pack(fill="x", pady=5)
+
+        ctk.CTkLabel(
+            frame,
+            text=f"{autor}:",
+            text_color="#60a5fa",
+            font=("Arial", 14, "bold")
+        ).pack(anchor="w", padx=10, pady=(5, 0))
+
+        ctk.CTkLabel(
+            frame,
+            text=texto,
+            wraplength=800,
+            justify="left"
+        ).pack(anchor="w", padx=10, pady=(0, 10))
