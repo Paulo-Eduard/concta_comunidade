@@ -13,7 +13,7 @@ class PerfilPage(ctk.CTkFrame):
         ctk.CTkButton(self, text="⬅ Voltar", width=100, command=voltar_callback).pack(anchor="nw", padx=20, pady=20)
         
         # 2. Área da Foto
-        self.lbl_foto = ctk.CTkLabel(self, text="Sem foto", width=150, height=150, fg_color="#333", corner_radius=75)
+        self.lbl_foto = ctk.CTkLabel(self, placeholder_text="Sem foto", width=150, height=150, fg_color="#333", corner_radius=45)
         self.lbl_foto.pack(pady=20)
         
         # 3. Título e Dados
@@ -22,7 +22,7 @@ class PerfilPage(ctk.CTkFrame):
         nome = self.usuario.get('nome', 'Usuário')
         tipo = self.usuario.get('tipo', 'Aluno')
         ctk.CTkLabel(self, text=f"Nome: {nome}", font=("Arial", 16)).pack(pady=5)
-        ctk.CTkLabel(self, text=f"Tipo: {tipo.capitalize()}", font=("Arial", 16)).pack(pady=5)
+        ctk.CTkLabel(self, text=f"Função: {tipo.capitalize()}", font=("Arial", 16)).pack(pady=5)
         
         # 4. Botões (Alterar Foto e Sair)
         ctk.CTkButton(self, text="Alterar Foto", command=self.selecionar_foto).pack(pady=10)

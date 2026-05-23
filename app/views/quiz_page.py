@@ -8,7 +8,7 @@ class QuizPage(ctk.CTkFrame):
         self.usuario = usuario_logado
         self.voltar = voltar_callback
         
-        ctk.CTkButton(self, text="⬅ Voltar", width=100, fg_color="gray", command=self.voltar).pack(anchor="nw", padx=20, pady=20)
+        ctk.CTkButton(self, text="⬅ Voltar", width=100, fg_color="#2d6a9f", command=self.voltar).pack(anchor="nw", padx=20, pady=20)
         
         if self.usuario.get('tipo') == 'professor':
             self.criar_painel_professor()

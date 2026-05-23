@@ -9,7 +9,7 @@ class SegurancaPage(ctk.CTkFrame):
         self.usuario = usuario_logado
         self.caminho_arquivo = ""
         
-        ctk.CTkButton(self, text="⬅ Voltar", width=100, fg_color="gray", command=voltar_callback).pack(anchor="nw", padx=20, pady=20)
+        ctk.CTkButton(self, text="⬅ Voltar", width=100, fg_color="#2d6a9f", command=voltar_callback).pack(anchor="nw", padx=20, pady=20)
         ctk.CTkLabel(self, text="Segurança Digital", font=("Arial", 24, "bold")).pack(pady=10)
 
         if self.usuario.get('tipo') == 'professor':
