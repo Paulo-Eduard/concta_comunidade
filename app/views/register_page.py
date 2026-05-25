@@ -16,17 +16,9 @@ class RegisterPage(ctk.CTkFrame):
         self.cadastro_callback = cadastro_callback
         self.voltar_callback = voltar_callback
 
-        # =====================================================
-        # CONFIGURAÇÃO
-        # =====================================================
-
         self.configure(
             fg_color="#0f172a"
         )
-
-        # =====================================================
-        # CONTAINER
-        # =====================================================
 
         container = ctk.CTkFrame(
             self,
@@ -37,10 +29,6 @@ class RegisterPage(ctk.CTkFrame):
             fill="both",
             expand=True
         )
-
-        # =====================================================
-        # LADO ESQUERDO
-        # =====================================================
 
         self.left = ctk.CTkFrame(
             container,
@@ -123,10 +111,6 @@ class RegisterPage(ctk.CTkFrame):
                 pady=6
             )
 
-        # =====================================================
-        # LADO DIREITO
-        # =====================================================
-
         self.right = ctk.CTkFrame(
             container,
             fg_color="#0f172a",
@@ -142,7 +126,7 @@ class RegisterPage(ctk.CTkFrame):
 
         form = ctk.CTkFrame(
             self.right,
-            width=520,
+            width=620,
             fg_color="#111827",
             corner_radius=25
         )
@@ -152,10 +136,6 @@ class RegisterPage(ctk.CTkFrame):
             rely=0.5,
             anchor="center"
         )
-
-        # =====================================================
-        # TÍTULO
-        # =====================================================
 
         titulo = ctk.CTkLabel(
             form,
@@ -178,10 +158,6 @@ class RegisterPage(ctk.CTkFrame):
         subtitulo.pack(
             pady=(0, 25)
         )
-
-        # =====================================================
-        # ENTRIES
-        # =====================================================
 
         self.nome = self.criar_entry(
             form,
@@ -215,10 +191,6 @@ class RegisterPage(ctk.CTkFrame):
             show="*"
         )
 
-        # =====================================================
-        # TIPO
-        # =====================================================
-
         tipo_frame = ctk.CTkFrame(
             form,
             fg_color="transparent"
@@ -226,7 +198,7 @@ class RegisterPage(ctk.CTkFrame):
 
         tipo_frame.pack(
             fill="x",
-            padx=40,
+            padx=45,
             pady=(10, 15)
         )
 
@@ -251,16 +223,26 @@ class RegisterPage(ctk.CTkFrame):
             fg_color="#2563eb",
             button_color="#1d4ed8",
             dropdown_fg_color="#111827",
-            dropdown_hover_color="#2563eb"
+            dropdown_hover_color="#2563eb",
+            command=self.alterar_tipo
         )
 
         self.tipo.pack(
             fill="x"
         )
 
-        # =====================================================
-        # BOTÃO
-        # =====================================================
+        self.admin_entry = ctk.CTkEntry(
+            form,
+            placeholder_text="Código administrador",
+            height=55,
+            corner_radius=12,
+            font=("Arial", 14),
+            fg_color="#1e293b",
+            border_color="#334155",
+            text_color="white",
+            placeholder_text_color="#64748b",
+            show="*"
+        )
 
         cadastrar = ctk.CTkButton(
             form,
@@ -278,10 +260,6 @@ class RegisterPage(ctk.CTkFrame):
             padx=40,
             pady=(10, 15)
         )
-
-        # =====================================================
-        # VOLTAR
-        # =====================================================
 
         voltar = ctk.CTkButton(
             form,
@@ -301,9 +279,19 @@ class RegisterPage(ctk.CTkFrame):
             pady=(0, 30)
         )
 
-    # =====================================================
-    # CRIAR ENTRY
-    # =====================================================
+    def alterar_tipo(self, valor):
+
+        if valor == "professor":
+
+            self.admin_entry.pack(
+                fill="x",
+                padx=40,
+                pady=8
+            )
+
+        else:
+
+            self.admin_entry.pack_forget()
 
     def criar_entry(
         self,
@@ -333,10 +321,6 @@ class RegisterPage(ctk.CTkFrame):
 
         return entry
 
-    # =====================================================
-    # CADASTRO
-    # =====================================================
-
     def fazer_cadastro(self):
 
         nome = self.nome.get().strip()
@@ -353,9 +337,7 @@ class RegisterPage(ctk.CTkFrame):
 
         tipo = self.tipo.get()
 
-        # =====================================================
-        # VALIDAÇÕES
-        # =====================================================
+        codigo_admin = self.admin_entry.get().strip()
 
         if (
             not nome or
@@ -369,6 +351,38 @@ class RegisterPage(ctk.CTkFrame):
             messagebox.showwarning(
                 "Campos vazios",
                 "Preencha todos os campos."
+            )
+
+            return
+
+        if "@" not in email:
+
+            messagebox.showerror(
+                "Email inválido",
+                "O email precisa conter @"
+            )
+
+            return
+
+        emails_validos = [
+
+            "@gmail.com",
+
+            "@hotmail.com",
+
+            "@outlook.com",
+
+            "@yahoo.com"
+        ]
+
+        if not any(
+            email.endswith(dominio)
+            for dominio in emails_validos
+        ):
+
+            messagebox.showerror(
+                "Email inválido",
+                "Digite um email válido."
             )
 
             return
@@ -391,9 +405,16 @@ class RegisterPage(ctk.CTkFrame):
 
             return
 
-        # =====================================================
-        # CADASTRAR
-        # =====================================================
+        if tipo == "professor":
+
+            if codigo_admin != "1945":
+
+                messagebox.showerror(
+                    "Acesso negado",
+                    "Código administrador incorreto."
+                )
+
+                return
 
         self.cadastro_callback(
             username,
